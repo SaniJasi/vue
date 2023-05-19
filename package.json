@@ -1,10 +1,11 @@
 {
   "name": "vue-todo",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite-ssg build",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
@@ -12,6 +13,7 @@
   "dependencies": {
     "pinia": "^2.0.36",
     "pinia-plugin-persistedstate": "^3.1.0",
+    "svgo": "^3.0.2",
     "vue": "^3.3.2",
     "vue-router": "^4.2.0"
   },
@@ -22,6 +24,9 @@
     "eslint": "^8.39.0",
     "eslint-plugin-vue": "^9.11.0",
     "prettier": "^2.8.8",
-    "vite": "^4.3.5"
+    "vite": "^4.3.5",
+    "vite-plugin-image-optimizer": "^1.1.4",
+    "vite-plugin-pages": "^0.30.1",
+    "vite-ssg": "^0.22.2"
   }
 }

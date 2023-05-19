@@ -57,7 +57,7 @@ a,
 main {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 50px 20px;
+  padding: 120px 20px 50px;
 }
 
 main h1 {
@@ -114,6 +114,14 @@ main h1 {
   padding: 0;
   background-color: transparent;
   cursor: pointer;
+}
+
+input,
+textarea,
+button {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    outline: none;
 }
 
 .remove-todo svg {
