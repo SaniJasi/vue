@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import AddTodo from '../components/AddTodo.vue'
 </script>
 

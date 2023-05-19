@@ -22,19 +22,19 @@
   </Popup>
 </template>
 
-<script>
+<script lang="ts">
 import Popup from './PopupConfirmation.vue'
-import { ref, computed, provide } from 'vue'
-import { useTodoListStore } from '../stores/useTodoListStore'
+import { ref, computed, provide, defineComponent } from 'vue'
+import { useTodoListStore, Todo } from '../stores/useTodoListStore'
 
-export default {
+export default defineComponent({
   components: {
     Popup
   },
   setup() {
     const todoListStore = useTodoListStore()
     const showPopup = ref(false)
-    let currentTodo = null
+    let currentTodo: Todo | null = null
 
     const handleConfirm = () => {
       if (currentTodo) {
@@ -69,5 +69,5 @@ export default {
       handleCancel
     }
   }
-}
+})
 </script>

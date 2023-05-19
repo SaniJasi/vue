@@ -1,8 +1,8 @@
 <template>
   <div v-if="todo" class="single-todo">
     <div class="single-todo__title">
-      <h1 v-if="!editItem">{{ name }}</h1>
-      <input v-else v-model="newName" :placeholder="name" />
+      <h1 v-if="!editItem">{{ todo.item.name }}</h1>
+      <input v-else v-model="newName" :placeholder="todo.item.name" />
     </div>
     <ul v-if="todo && todo.item">
       <li v-for="(field, index) in todo.item.todos" :key="index">
@@ -10,12 +10,7 @@
         <span v-if="!editItem">{{ field.name }}</span>
         <input type="text" v-else v-model="field.name" :placeholder="field.name" required />
         <button class="remove-me" @click="removeField(index)" v-if="editItem">
-          <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
-            <path
-              d="M488.110569,399.973984 L787.219512,100.852033 C795.447154,92.6178862 799.986992,81.6325203 800,69.9186992 C800,58.198374 795.460163,47.2 787.219512,38.9788618 L761.00813,12.7739837 C752.76748,4.5203252 741.782114,0 730.055285,0 C718.347967,0 707.362602,4.5203252 699.121951,12.7739837 L400.013008,311.876423 L100.891057,12.7739837 C92.6634146,4.5203252 81.6715447,0 69.9512195,0 C58.2439024,0 47.2520325,4.5203252 39.0243902,12.7739837 L12.8,38.9788618 C-4.26666667,56.0455285 -4.26666667,83.804878 12.8,100.852033 L311.915447,399.973984 L12.8,699.082927 C4.56585366,707.330081 0.0325203252,718.315447 0.0325203252,730.029268 C0.0325203252,741.743089 4.56585366,752.728455 12.8,760.969106 L39.0178862,787.173984 C47.2455285,795.421138 58.2439024,799.947967 69.9447154,799.947967 C81.6650407,799.947967 92.6569106,795.421138 100.884553,787.173984 L400.006504,488.065041 L699.115447,787.173984 C707.356098,795.421138 718.341463,799.947967 730.04878,799.947967 L730.061789,799.947967 C741.77561,799.947967 752.760976,795.421138 761.001626,787.173984 L787.213008,760.969106 C795.44065,752.734959 799.980488,741.743089 799.980488,730.029268 C799.980488,718.315447 795.44065,707.330081 787.213008,699.089431 L488.110569,399.973984 Z"
-              transform="translate(0 .026)"
-            />
-          </svg>
+          <IconRemove />
         </button>
       </li>
     </ul>
@@ -31,31 +26,48 @@
   <Popup :is-open="showPopup" @confirm="deleteItem" @cancel="cancelDelete">
     <p>Are you sure you want to delete this item?</p>
   </Popup>
+  <div v-if="showMsg" class="success">Saved</div>
 </template>
 
-<script>
+<script lang="ts">
 import Popup from '../components/PopupConfirmation.vue'
+import IconRemove from '../components/icons/IconRemove.vue'
 import { computed, ref, provide, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTodoListStore } from '../stores/useTodoListStore'
 
+interface Field {
+  name: string
+  checked: boolean
+}
+
+interface TodoItem {
+  id: string
+  item: {
+    name: string
+    todos: Field[]
+  }
+}
+
 export default {
   components: {
-    Popup
+    Popup,
+    IconRemove
   },
   setup() {
     const router = useRouter()
     const route = useRoute()
     const todoListStore = useTodoListStore()
-    const showPopup = ref(false)
-    const editItem = ref(false)
-    const checkedFields = ref([])
-    const editableFields = reactive({})
+    const showPopup = ref<boolean>(false)
+    const editItem = ref<boolean>(false)
+    const showMsg = ref<boolean>(false)
+    const checkedFields = ref<string[]>([])
+    const editableFields = reactive<{ [key: string]: string }>({})
     const newName = ref('')
-    const originalFields = ref([])
+    const originalFields = ref<Field[]>([])
 
     // Access the getTodoByName getter
-    const getTodoByName = (name) => {
+    const getTodoByName = (name: string): TodoItem | undefined => {
       return todoListStore.getTodoByName(name)
     }
 
@@ -68,7 +80,7 @@ export default {
     // Delete item
     const deleteItem = () => {
       if (todo.value) {
-        todoListStore.deleteItem(todo.value.id)
+        todoListStore.deleteItem(todo.value?.id)
         // Redirect to home or any other appropriate page
         router.push('/')
       }
@@ -81,7 +93,7 @@ export default {
 
     const editFields = () => {
       if (!editItem.value) {
-        originalFields.value = [...todo.value.item.todos]
+        originalFields.value = [...todo.value?.item.todos]
       } else {
         todo.value.item.todos = [...originalFields.value]
       }
@@ -111,9 +123,10 @@ export default {
         })
 
         if (newName.value.length > 0) {
-          router.push(`/todo/${newName.value}`)
+          const url = newName.value.toLowerCase().replaceAll(' ', '-')
+          router.push(`/todo/${url}`)
         } else {
-          newName.value = name.value
+          newName.value = todo.value.item.name
         }
 
         const updatedTodo = {
@@ -125,9 +138,13 @@ export default {
           }
         }
 
-        console.log(updatedTodo.item.todos)
         editItem.value = false
         todoListStore.updateItem(updatedTodo)
+        showMsg.value = true
+
+        setTimeout(() => {
+          showMsg.value = false
+        }, 2000)
       }
     }
 
@@ -145,7 +162,8 @@ export default {
       addField,
       removeField,
       name,
-      editableFields
+      editableFields,
+      showMsg
     }
   }
 }
