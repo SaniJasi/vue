@@ -26,7 +26,7 @@ import { useRouter } from 'vue-router'
 import IconRemove from './icons/IconRemove.vue'
 
 export default {
-  component: {
+  components: {
     IconRemove
   },
   setup() {

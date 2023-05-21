@@ -23,7 +23,7 @@
       <button class="btn btn--primary" @click="saveChanges">Save</button>
     </div>
   </div>
-  <Popup :is-open="showPopup" @confirm="deleteItem" @cancel="cancelDelete">
+  <Popup :isOpen="showPopup" @confirm="deleteItem" @cancel="cancelDelete">
     <p>Are you sure you want to delete this item?</p>
   </Popup>
   <div v-if="showMsg" class="success">Saved</div>
@@ -93,9 +93,11 @@ export default {
 
     const editFields = () => {
       if (!editItem.value) {
-        originalFields.value = [...todo.value?.item.todos]
+        originalFields.value = [...(todo.value?.item.todos ?? [])]
       } else {
-        todo.value.item.todos = [...originalFields.value]
+        if (todo.value) {
+          todo.value.item.todos = [...originalFields.value]
+        }
       }
       editItem.value = !editItem.value
     }
@@ -106,11 +108,15 @@ export default {
     }
 
     const addField = () => {
-      todo.value.item.todos.push({ name: '', checked: false })
+      if (todo.value) {
+        todo.value.item.todos.push({ name: '', checked: false })
+      }
     }
 
-    const removeField = (index) => {
-      todo.value.item.todos.splice(index, 1)
+    const removeField = (index: number) => {
+      if (todo.value) {
+        todo.value.item.todos.splice(index, 1)
+      }
     }
 
     const saveChanges = () => {
@@ -123,7 +129,7 @@ export default {
         })
 
         if (newName.value.length > 0) {
-          const url = newName.value.toLowerCase().replaceAll(' ', '-')
+          const url = newName.value.toLowerCase().replace(/ /g, '-')
           router.push(`/todo/${url}`)
         } else {
           newName.value = todo.value.item.name
@@ -139,7 +145,7 @@ export default {
         }
 
         editItem.value = false
-        todoListStore.updateItem(updatedTodo)
+        todoListStore.updateItem({ ...updatedTodo, completed: false })
         showMsg.value = true
 
         setTimeout(() => {
@@ -163,7 +169,8 @@ export default {
       removeField,
       name,
       editableFields,
-      showMsg
+      showMsg,
+      showPopup
     }
   }
 }

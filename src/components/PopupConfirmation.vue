@@ -15,10 +15,10 @@ import { inject, ref } from 'vue'
 
 export default {
   setup() {
-    const isOpen = inject('popup', ref(false))
+    const showPopup = inject('popup', ref(false))
 
     return {
-      isOpen
+      isOpen: showPopup
     }
   }
 }
